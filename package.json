@@ -16,6 +16,7 @@
     "vitest": "^5.1.2"
   },
   "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
     "jszip": "^3.10.2",
     "pica": "^10.0.3"
   }
