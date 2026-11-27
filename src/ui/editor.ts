@@ -28,7 +28,7 @@ export function mountEditor(
   state: EditorState,
   onNext: (s: EditorState) => void,
   onChangePhoto?: () => void,
-): void {
+): () => void {
   const { bmp } = state;
   const imgW = bmp.width;
   const imgH = bmp.height;
@@ -233,7 +233,14 @@ export function mountEditor(
   const change = $<HTMLButtonElement>('[data-act="change"]');
   if (onChangePhoto) change.onclick = onChangePhoto; else change.hidden = true;
 
-  new ResizeObserver(layout).observe(stage);
+  const observer = new ResizeObserver(layout);
+  observer.observe(stage);
   layout();
   update();
+
+  // Desmontar: solta o observador e a cópia de exibição (memória no iPhone).
+  return () => {
+    observer.disconnect();
+    display.width = display.height = 0;
+  };
 }

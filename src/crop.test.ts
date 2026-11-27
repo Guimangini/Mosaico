@@ -69,3 +69,13 @@ describe('crop', () => {
     expect(qualityLevel(upscaleFactor(initialCrop(600, 800, 3)))).toBe('strong');
   });
 });
+
+describe('clampRectToImage', () => {
+  it('corta excesso de ponto flutuante na borda', async () => {
+    const { clampRectToImage } = await import('./crop');
+    const r = clampRectToImage({ x: 2000, y: 2666.6666666666665, w: 1000.0000000000005, h: 1333.3333333333337 }, 3000, 4000);
+    expect(r.x + r.w).toBeLessThanOrEqual(3000);
+    expect(r.y + r.h).toBeLessThanOrEqual(4000);
+    expect(r.w).toBeCloseTo(1000);
+  });
+});

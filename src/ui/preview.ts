@@ -36,11 +36,11 @@ export function mountPreview(root: HTMLElement, state: EditorState, onBack: () =
   const status = $<HTMLParagraphElement>('.status');
   const save = $<HTMLButtonElement>('[data-act="save"]');
   const urls: string[] = [];
-  let cancelled = false;
+  const abort = new AbortController();
   let items: RenderedTile[] = [];
 
   $<HTMLButtonElement>('[data-act="back"]').onclick = () => {
-    cancelled = true;
+    abort.abort();
     urls.forEach(URL.revokeObjectURL);
     onBack();
   };
@@ -49,9 +49,9 @@ export function mountPreview(root: HTMLElement, state: EditorState, onBack: () =
     fill.style.width = `${(done / n) * 100}%`;
     progress.setAttribute('aria-valuenow', String(done));
     ptext.textContent = `Cortando ${done} de ${n}…`;
-  })
+  }, abort.signal)
     .then((result) => {
-      if (cancelled) return;
+      if (abort.signal.aborted) return;
       items = result;
       // Grade em ordem de leitura, como no perfil.
       const byReading = [...result].sort((a, b) => a.tile.row - b.tile.row || a.tile.col - b.tile.col);
@@ -69,7 +69,7 @@ export function mountPreview(root: HTMLElement, state: EditorState, onBack: () =
       save.disabled = false;
     })
     .catch(() => {
-      if (cancelled) return;
+      if (abort.signal.aborted) return;
       progress.hidden = true;
       status.textContent = 'Não deu para cortar a foto. Volte e tente com menos linhas ou outra foto.';
     });

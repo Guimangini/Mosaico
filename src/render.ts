@@ -1,5 +1,5 @@
 import { TILE_H, TILE_W, tiles, type Tile } from './grid';
-import { tileSourceRect, type Rect } from './crop';
+import { clampRectToImage, tileSourceRect, type Rect } from './crop';
 
 export type RenderedTile = { tile: Tile; blob: Blob };
 
@@ -17,7 +17,9 @@ export async function renderTiles(
   rows: number,
   sharpen: boolean,
   onProgress?: (done: number, total: number) => void,
+  signal?: AbortSignal,
 ): Promise<RenderedTile[]> {
+  signal?.throwIfAborted();
   const { default: createPica } = await import('pica');
   const pica = createPica({ features: ['js', 'wasm', 'ww'] });
   const list = tiles(rows).sort((a, b) => a.postIndex - b.postIndex);
@@ -28,7 +30,8 @@ export async function renderTiles(
   dest.height = TILE_H;
 
   for (const tile of list) {
-    const r = tileSourceRect(crop, tile.row, tile.col, rows);
+    signal?.throwIfAborted();
+    const r = clampRectToImage(tileSourceRect(crop, tile.row, tile.col, rows), bmp.width, bmp.height);
     const size = tileSourceCanvasSize(r);
     const src = document.createElement('canvas');
     src.width = size.w;

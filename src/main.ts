@@ -5,8 +5,23 @@ import { mountEditor, newEditorState, type EditorState } from './ui/editor';
 import { mountPreview } from './ui/preview';
 
 const root = document.getElementById('app')!;
+let current: EditorState | null = null;
+let unmountEditor: (() => void) | null = null;
+
+function leaveEditor() {
+  unmountEditor?.();
+  unmountEditor = null;
+}
+
+/** Libera a foto anterior: um bitmap de 48 MP ocupa ~190 MB no iPhone. */
+function dropPhoto() {
+  leaveEditor();
+  current?.bmp.close();
+  current = null;
+}
 
 function showPicker(error?: string) {
+  dropPhoto();
   root.innerHTML = `
     <section class="screen picker">
       <div class="mat-hero" aria-hidden="true">
@@ -35,10 +50,12 @@ function showPicker(error?: string) {
 }
 
 function showEditor(state: EditorState) {
-  mountEditor(root, state, (s) => showPreview(s), () => showPicker());
+  current = state;
+  unmountEditor = mountEditor(root, state, (s) => showPreview(s), () => showPicker());
 }
 
 function showPreview(state: EditorState) {
+  leaveEditor();
   mountPreview(root, state, () => showEditor(state));
 }
 

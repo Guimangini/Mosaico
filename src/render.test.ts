@@ -13,3 +13,15 @@ describe('render', () => {
     expect(s).toEqual({ w: 1000, h: 1334 });
   });
 });
+
+describe('renderTiles cancelamento', () => {
+  it('sinal já abortado rejeita com AbortError antes de qualquer trabalho', async () => {
+    const { renderTiles } = await import('./render');
+    const ac = new AbortController();
+    ac.abort();
+    const bmp = { width: 3000, height: 4000 } as ImageBitmap;
+    await expect(
+      renderTiles(bmp, { x: 0, y: 0, w: 3000, h: 4000 }, 3, false, undefined, ac.signal),
+    ).rejects.toMatchObject({ name: 'AbortError' });
+  });
+});

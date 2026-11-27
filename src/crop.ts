@@ -73,3 +73,10 @@ export function qualityLevel(f: number): QualityLevel {
   if (f <= 1.5) return 'moderate';
   return 'strong';
 }
+
+/** Remove excessos de ponto flutuante para o retângulo nunca passar da foto. */
+export function clampRectToImage(r: Rect, imgW: number, imgH: number): Rect {
+  const x = Math.max(0, r.x);
+  const y = Math.max(0, r.y);
+  return { x, y, w: Math.min(r.w, imgW - x), h: Math.min(r.h, imgH - y) };
+}
