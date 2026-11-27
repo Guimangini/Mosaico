@@ -1,0 +1,23 @@
+{
+  "name": "mosaico",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/pica": "^9.0.5",
+    "typescript": "~7.0.2",
+    "vite": "^8.4.0",
+    "vite-plugin-pwa": "^2.0.0",
+    "vitest": "^5.1.2"
+  },
+  "dependencies": {
+    "jszip": "^3.10.2",
+    "pica": "^10.0.3"
+  }
+}
